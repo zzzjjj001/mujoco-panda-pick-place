@@ -1,0 +1,24 @@
+{
+  "n_episodes": 1,
+  "seed": 42,
+  "grasp_success_rate": 1.0,
+  "place_success_rate": 1.0,
+  "avg_steps_place_success": 1155.0,
+  "failure_breakdown": {},
+  "wall_time_s": 80.9,
+  "per_episode": [
+    {
+      "steps": 1155,
+      "grasp_success": true,
+      "place_success": true,
+      "max_lift": 0.2228,
+      "contact_ever": true,
+      "min_tcp_dist": 0.0007,
+      "cube_off_table": false,
+      "final_state": "DONE",
+      "truncated": false,
+      "failure": null,
+      "episode": 0
+    }
+  ]
+}

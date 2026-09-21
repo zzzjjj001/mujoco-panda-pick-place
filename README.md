@@ -9,6 +9,8 @@ hand-written and fully inspectable.**
 Result: **100 % grasp and 100 % place success over 50 episodes** on two
 independent random seeds (see [Results](#results)).
 
+![Demo: Panda pick-and-place in MuJoCo](docs/demo.gif)
+
 > Generate a demo video with `python run_eval.py --record 3`
 > (writes `results/eval_video.mp4`).
 
