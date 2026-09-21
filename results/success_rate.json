@@ -5,7 +5,7 @@
   "place_success_rate": 1.0,
   "avg_steps_place_success": 1347.5,
   "failure_breakdown": {},
-  "wall_time_s": 65.6,
+  "wall_time_s": 136.4,
   "per_episode": [
     {
       "steps": 1155,

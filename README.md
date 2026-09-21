@@ -11,8 +11,7 @@ independent random seeds (see [Results](#results)).
 
 ![Demo: Panda pick-and-place in MuJoCo](docs/demo.gif)
 
-> Generate a demo video with `python run_eval.py --record 3`
-> (writes `results/eval_video.mp4`).
+> Regenerate with `python run_eval.py --record 1` (writes `results/eval_video.mp4`).
 
 ## Task
 
@@ -27,19 +26,19 @@ Success criteria are deliberately strict (following the
 [leap-dexterous-grasping](https://github.com/flyingGH/leap-dexterous-grasping)
 convention):
 
-| Criterion | Definition |
-|---|---|
+| Criterion       | Definition                                                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `grasp_success` | cube lifted **> 5 cm** above the table surface and kept there for **20 consecutive control steps** (rejects momentary lifts) |
-| `place_success` | at episode end the cube is at rest (**speed < 5 cm/s**) within **6.5 cm** (XY) of the pad center |
+| `place_success` | at episode end the cube is at rest (**speed < 5 cm/s**) within **6.5 cm** (XY) of the pad center                             |
 
 ## Results
 
 Batch evaluation, 50 episodes per seed, fixed RNG seeds, headless:
 
 | Seed | Episodes | Grasp success | Place success | Avg steps (placed) | Failures |
-|---|---|---|---|---|---|
-| 42 | 50 | **100 %** | **100 %** | 1347.5 (13.5 s) | — |
-| 0  | 50 | **100 %** | **100 %** | 1304.7 (13.0 s) | — |
+| ---- | -------- | ------------- | ------------- | ------------------ | -------- |
+| 42   | 50       | **100 %**     | **100 %**     | 1347.5 (13.5 s)    | —        |
+| 0    | 50       | **100 %**     | **100 %**     | 1304.7 (13.0 s)    | —        |
 
 Per-episode details (steps, max lift, failure class) are stored in
 `results/success_rate.json` and `results/success_rate_seed0.json`.
@@ -74,22 +73,22 @@ Each state emits a Cartesian target + gripper command and advances when the
 position/orientation error stays below tolerance for 3 consecutive steps
 (500-step per-state timeout as fallback):
 
-| State | Action | Exit condition |
-|---|---|---|
-| `HOVER` | track point 12 cm above the cube, jaws open | converged |
-| `DESCEND` | vertical descent to cube center height | converged |
-| `CLOSE` | close jaws (≈1.1 N/finger), stall-detect grip width | width stable for 0.1 s + 0.3 s squeeze |
-| `LIFT` | vertical lift 20 cm | converged |
-| `TRANSIT` | carry to 15 cm above the pad | converged |
-| `LOWER` | descend to **6 cm** above the pad (low drop → no bounce-out) | converged |
-| `RELEASE` | open jaws | 0.4 s |
-| `RETRACT` | retreat | converged → `DONE` |
+| State     | Action                                                       | Exit condition                         |
+| --------- | ------------------------------------------------------------ | -------------------------------------- |
+| `HOVER`   | track point 12 cm above the cube, jaws open                  | converged                              |
+| `DESCEND` | vertical descent to cube center height                       | converged                              |
+| `CLOSE`   | close jaws (≈1.1 N/finger), stall-detect grip width          | width stable for 0.1 s + 0.3 s squeeze |
+| `LIFT`    | vertical lift 20 cm                                          | converged                              |
+| `TRANSIT` | carry to 15 cm above the pad                                 | converged                              |
+| `LOWER`   | descend to **6 cm** above the pad (low drop → no bounce-out) | converged                              |
+| `RELEASE` | open jaws                                                    | 0.4 s                                  |
+| `RETRACT` | retreat                                                      | converged → `DONE`                     |
 
 Key design decisions:
 
 - **Yaw-aligned face grasp.** The gripper opening is rotated to be exactly
   parallel to one pair of cube faces (relative yaw folded to ±45°, joint 7 has
-  plenty of travel). With random cube yaw this is *essential*: an unaligned
+  plenty of travel). With random cube yaw this is _essential_: an unaligned
   grasp lands on the cube's diagonal (jaw gap 0.067 m instead of 0.050 m), and
   the edge-contact friction cone cannot hold the cube through the transit — it
   slips mid-air. After alignment every grasp is a stable full-face grip
@@ -129,20 +128,20 @@ FSM's grasp confirmation.
 
 `eval/diagnose.py` classifies every failed episode into an actionable taxonomy:
 
-| Class | Meaning |
-|---|---|
-| `NOT_REACHED` | TCP never got within 5 cm of the cube |
-| `GRASP_FAILED` | contact happened but no stable grip was established |
-| `SLIPPED` | cube was lifted ≥ 5 cm but dropped before release |
-| `MISSED_BIN` | grasp succeeded, cube not at rest inside the pad tolerance |
-| `KNOCKED_OFF_TABLE` | cube knocked off the table edge |
+| Class               | Meaning                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `NOT_REACHED`       | TCP never got within 5 cm of the cube                      |
+| `GRASP_FAILED`      | contact happened but no stable grip was established        |
+| `SLIPPED`           | cube was lifted ≥ 5 cm but dropped before release          |
+| `MISSED_BIN`        | grasp succeeded, cube not at rest inside the pad tolerance |
+| `KNOCKED_OFF_TABLE` | cube knocked off the table edge                            |
 
 The controller currently achieves a clean sweep, but the harness keeps the
 diagnostic trail of every earlier failure mode. Bugs that were found, root-caused
 and fixed during development (all verified by targeted probing scripts):
 
 1. **Mirror-image yaw alignment** — reading the cube yaw from `xmat[1]`
-   (row-major `R[0][1]`, not `R[1][0]`) returns *−yaw*, silently turning every
+   (row-major `R[0][1]`, not `R[1][0]`) returns _−yaw_, silently turning every
    aligned grasp into a 45° diagonal grasp that slipped mid-transit. This was the
    dominant failure (18 % of episodes) and was proven by a jaw-angle sweep:
    width 0.067 m ⇒ edge contact, 0.050 m ⇒ face contact.
@@ -212,11 +211,3 @@ python run_eval.py --episodes 50 --seed 42
 ```
 
 reproduces the exact table above step-for-step on any platform.
-
-## References
-
-- Robot model: [MuJoCo Menagerie — Franka Emika Panda](https://github.com/google-deepmind/mujoco_menagerie)
-  (vendored unmodified; its BSD-style license applies to `franka_emika_panda/`)
-- Success-criteria convention: [leap-dexterous-grasping](https://github.com/flyingGH/leap-dexterous-grasping)
-- Related benchmarks: [DexGraspBench](https://github.com/flyingGH/DexGraspBench),
-  [panda_mujoco_gym](https://github.com/zichunxx/panda_mujoco_gym)
