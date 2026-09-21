@@ -1,0 +1,44 @@
+<mujoco model="panda grasp scene">
+  <include file="panda.xml"/>
+
+  <statistic center="0.4 0 0.4" extent="1.0"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="120" elevation="-20"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+
+    <!-- 桌面: x 0.30-0.70, y -0.45-0.45, 台面高度 0.42 -->
+    <body name="table" pos="0.5 0 0">
+      <geom name="table_top" type="box" size="0.2 0.45 0.02" pos="0 0 0.4"
+            rgba="0.85 0.7 0.55 1" friction="1 0.005 0.0001"/>
+    </body>
+
+    <!-- 抓取目标: 5cm 立方体 (freejoint 使其可被物理驱动) -->
+    <body name="target_cube" pos="0.5 0 0.4455">
+      <freejoint name="cube_free"/>
+      <geom name="cube" type="box" size="0.025 0.025 0.025" rgba="0.9 0.1 0.1 1"
+            mass="0.1" friction="1 0.005 0.0001"/>
+    </body>
+
+    <!-- 放置区: 绿色垫板 -->
+    <body name="target_pad" pos="0.42 -0.36 0.425">
+      <geom name="pad" type="box" size="0.07 0.07 0.005" rgba="0.1 0.8 0.2 0.6"
+            friction="1 0.005 0.0001"/>
+    </body>
+
+    <camera name="eval_cam" pos="1.4 -0.9 1.2" xyaxes="0.707 0.707 0 -0.359 0.359 0.861"/>
+  </worldbody>
+</mujoco>
